@@ -1,0 +1,32 @@
+name: Build Debug APK
+
+on:
+  push:
+    branches:
+      - main # or any branch you want to trigger the workflow on
+  workflow_dispatch: # Allows manually triggering the workflow from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'  # You can specify a version if needed, e.g. '3.0.0'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK in Debug mode
+        run: flutter build apk --debug
+
+      - name: Upload Debug APK as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

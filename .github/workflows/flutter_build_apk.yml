@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2.3.0  # Use a specific and tested version
+        uses: subosito/flutter-action@v2  
         with:
           flutter-version: stable
 

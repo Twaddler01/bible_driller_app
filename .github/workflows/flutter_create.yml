@@ -24,7 +24,6 @@ jobs:
           flutter create bible_driller_app
 
           # Git commit
-          # Git commit
           git config --global user.name "Twaddler01"
           git config --global user.email "kenleydad@gmail.com"
           git add bible_driller_app

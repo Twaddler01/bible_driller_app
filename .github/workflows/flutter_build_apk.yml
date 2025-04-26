@@ -3,8 +3,8 @@ name: Build Debug APK
 on:
   push:
     branches:
-      - main # or any branch you want to trigger the workflow on
-  workflow_dispatch: # Allows manually triggering the workflow from GitHub UI
+      - main # Trigger on push to the main branch
+  workflow_dispatch: # Allows manual triggering from GitHub UI
 
 jobs:
   build:
@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Use the latest stable version of checkout
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v2 # Ensure the flutter action is the latest stable version
         with:
-          flutter-version: 'stable'  # You can specify a version if needed, e.g. '3.0.0'
+          flutter-version: 'stable'  # You can specify a Flutter version, 'stable' is the default
 
       - name: Install dependencies
         run: flutter pub get
@@ -26,7 +26,7 @@ jobs:
         run: flutter build apk --debug
 
       - name: Upload Debug APK as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3  # Ensure the latest stable version of upload-artifact is used
         with:
           name: debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk

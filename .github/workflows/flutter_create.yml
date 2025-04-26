@@ -24,8 +24,9 @@ jobs:
           flutter create bible_driller_app
 
           # Git commit
+          # Git commit
           git config --global user.name "Twaddler01"
           git config --global user.email "kenleydad@gmail.com"
           git add bible_driller_app
           git commit -m "Add created Flutter app"
-          git push https://${{ secrets.GH_TOKEN }}@github.com/Twaddler01/bible_driller_app.git
+          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git

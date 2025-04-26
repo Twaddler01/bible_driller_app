@@ -6,6 +6,8 @@ on:
 jobs:
   create_app:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Grant write access to the repository
 
     steps:
       - name: Checkout repo
@@ -23,16 +25,9 @@ jobs:
           # Create Flutter project
           flutter create bible_driller_app
 
-          # Copy the created project into the repo root
-          cp -r bible_driller_app/* ./
-          cp -r bible_driller_app/.* ./ || true  # Copy hidden files too
-
-          # Clean up
-          rm -rf bible_driller_app
-
           # Git commit
           git config --global user.name "Twaddler01"
           git config --global user.email "kenleydad@gmail.com"
-          git add .
+          git add bible_driller_app
           git commit -m "Add created Flutter app"
           git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git

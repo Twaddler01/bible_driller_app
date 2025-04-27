@@ -1,31 +1,32 @@
-name: Flutter Build Debug APK
+name: Build Debug APK
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  build_debug_apk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1  # Only latest commit for speed
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-         with:
-           flutter-version: stable
+        uses: actions/setup-flutter@v2
+        with:
+          flutter-version: stable
 
-      - name: Build debug APK
-        working-directory: bible_driller_app
-        run: |
-          flutter pub get
-          flutter build apk --debug
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Upload APK
+      - name: Build APK in Debug mode
+        run: flutter build apk --debug
+
+      - name: Upload Debug APK as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bible_driller_app-debug
-          path: bible_driller_app/build/app/outputs/flutter-apk/app-debug.apk
+          name: debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

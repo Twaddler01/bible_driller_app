@@ -6,8 +6,6 @@ on:
 jobs:
   build_debug_apk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code
@@ -15,11 +13,10 @@ jobs:
         with:
           fetch-depth: 1  # Only latest commit for speed
 
-      - name: Install Flutter manually
-        run: |
-          git clone https://github.com/flutter/flutter.git -b stable
-          echo "$PWD/flutter/bin" >> $GITHUB_PATH
-          flutter doctor
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+         with:
+           flutter-version: stable
 
       - name: Build debug APK
         working-directory: bible_driller_app

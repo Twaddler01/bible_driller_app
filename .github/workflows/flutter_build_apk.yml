@@ -16,10 +16,11 @@ jobs:
           fetch-depth: 1  # Only latest commit for speed
       - name: Install Flutter manually
         run: |
-          # Install Flutter
           git clone https://github.com/flutter/flutter.git -b stable
-          export PATH="$PATH:$GITHUB_WORKSPACE/flutter/bin"          
+          echo "$PWD/flutter/bin" >> $GITHUB_PATH
           flutter doctor
+      - name: Get dependencies
+        run: flutter pub get
       - name: Build debug APK
         working-directory: bible_driller_app
         run: |

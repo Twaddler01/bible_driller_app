@@ -18,7 +18,8 @@ jobs:
         run: |
           # Install Flutter
           git clone https://github.com/flutter/flutter.git -b stable
-          export PATH="$PATH:$GITHUB_WORKSPACE/flutter/bin"          flutter doctor
+          export PATH="$PATH:$GITHUB_WORKSPACE/flutter/bin"          
+          flutter doctor
       - name: Build debug APK
         working-directory: bible_driller_app
         run: |

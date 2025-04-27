@@ -12,7 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        uses: actions/setup-node@v3
         with:
           fetch-depth: 1  # Only latest commit for speed
 
@@ -29,7 +28,7 @@ jobs:
           flutter build apk --debug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bible_driller_app-debug
           path: bible_driller_app/build/app/outputs/flutter-apk/app-debug.apk

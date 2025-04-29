@@ -18,6 +18,7 @@ class SelectScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Select Version:', style: TextStyle(fontSize: 18)),
             DropdownButton<String>(
@@ -38,16 +39,20 @@ class SelectScreen extends StatelessWidget {
                 child: Text(c),
               )).toList(),
             ),
-            Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => DrillScreen()),
-                );
-              },
-              child: Text('Start Drills'),
-            )
+            SizedBox(height: 20), // space before button
+            Center(
+              child: ElevatedButton(
+                onPressed: (selection.version.isNotEmpty && selection.color.isNotEmpty)
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => DrillScreen()),
+                        );
+                      }
+                    : null, // disables the button
+                child: Text('Start Drills'),
+              ),
+            ),
           ],
         ),
       ),

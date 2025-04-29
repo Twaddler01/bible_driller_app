@@ -32,8 +32,29 @@ class DrillScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Version: ${selection.version}', style: TextStyle(fontSize: 18)),
-            Text('Color: ${selection.color}', style: TextStyle(fontSize: 18)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Version: ${selection.version}', style: TextStyle(fontSize: 18)),
+                    Text('Color: ${selection.color}', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+                SizedBox(width: 8), // Small space between text and edit icon
+                Align(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    icon: Icon(Icons.edit),
+                    tooltip: 'Change Selection',
+                    onPressed: () {
+                      Navigator.pop(context); // Go back to selection screen
+                    },
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -43,7 +64,6 @@ class DrillScreen extends StatelessWidget {
                     child: ListTile(
                       title: Text(drills[index]),
                       onTap: () {
-                        // Handle starting the selected drill
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Starting ${drills[index]}...')),
                         );

@@ -17,15 +17,6 @@ class DrillScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Bible Drills'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            tooltip: 'Change Selection',
-            onPressed: () {
-              Navigator.pop(context); // Go back to selection screen
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

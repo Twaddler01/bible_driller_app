@@ -17,10 +17,20 @@ class DrillScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Bible Drills'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.edit),
+            tooltip: 'Change Selection',
+            onPressed: () {
+              Navigator.pop(context); // Go back to selection screen
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Version: ${selection.version}', style: TextStyle(fontSize: 18)),
             Text('Color: ${selection.color}', style: TextStyle(fontSize: 18)),
@@ -35,7 +45,7 @@ class DrillScreen extends StatelessWidget {
                       onTap: () {
                         // Handle starting the selected drill
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Starting ${drills[index]}...'))
+                          SnackBar(content: Text('Starting ${drills[index]}...')),
                         );
                       },
                     ),

@@ -1,0 +1,39 @@
+name: AUTO Flutter Build Debug APK
+
+on:
+  push:
+    branches:
+      - debug
+
+jobs:
+  build_debug_apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter --version
+
+      - name: Get dependencies
+        working-directory: bible_driller_app
+        run: flutter pub get
+
+      - name: Build debug APK
+        working-directory: bible_driller_app
+        run: flutter build apk --debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: bible_driller_app-debug
+          path: bible_driller_app/build/app/outputs/flutter-apk/app-debug.apk

@@ -13,25 +13,9 @@ void main() {
   );
 }
 
-class RouteObserverProvider extends NavigatorObserver {
-  String? currentRoute;
-
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    currentRoute = route.settings.name;
-    super.didPush(route, previousRoute);
-  }
-
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    currentRoute = previousRoute?.settings.name;
-    super.didPop(route, previousRoute);
-  }
-}
-
-final RouteObserverProvider _routeObserver = RouteObserverProvider();
-
 class BibleDrillerApp extends StatelessWidget {
+  const BibleDrillerApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,7 +23,6 @@ class BibleDrillerApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      navigatorObservers: [_routeObserver],
       routes: {
       '/': (context) => SelectScreen(),        // Your home screen
       '/selectScreen': (context) => SelectScreen(),

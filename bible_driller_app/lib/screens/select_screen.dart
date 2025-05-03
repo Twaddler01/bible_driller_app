@@ -4,8 +4,10 @@ import '../models/selection_model.dart';
 import 'drill_screen.dart';
 
 class SelectScreen extends StatelessWidget {
-  final List<String> versions = ['KJV', 'CSB'];
-  final List<String> colors = ['Red', 'Green', 'Blue'];
+  final List<String> versions = const ['KJV', 'CSB'];
+  final List<String> colors = const ['Red', 'Green', 'Blue'];
+
+  const SelectScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +16,7 @@ class SelectScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Select Options'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

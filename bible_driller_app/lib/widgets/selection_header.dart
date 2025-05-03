@@ -1,22 +1,20 @@
-import 'package:bible_driller_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/selection_model.dart';
 
 class SelectionHeader extends StatelessWidget {
   final VoidCallback? onEdit;
-  final bool isDrillScreen;
+  final bool isDrillStarted;
 
   const SelectionHeader({
-  Key? key,
+  super.key,
   this.onEdit,
-  this.isDrillScreen = false,
-  }) : super(key: key);
+  this.isDrillStarted = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final selection = Provider.of<SelectionModel>(context);
-    final routeObserver = Navigator.of(context).widget.observers.first as RouteObserverProvider;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -40,9 +38,9 @@ class SelectionHeader extends StatelessWidget {
                   tooltip: 'Change Selection',
                   onPressed: () async {
                     final navigator = Navigator.of(context); // capture before the async gap
-                    final currentRoute = routeObserver.currentRoute;
-                    print(currentRoute);
-                    if (isDrillScreen) {
+                    final selection = Provider.of<SelectionModel>(context, listen: false);
+                    final drillStarted = selection.drillStarted;
+                    if (drillStarted) {
                       final shouldLeave = await showDialog<bool>(
                         context: context,
                         builder: (dialogContext) => AlertDialog(
@@ -62,8 +60,9 @@ class SelectionHeader extends StatelessWidget {
                       );
                       
                       if (shouldLeave != true) return;
+                      selection.resetDrill();
                     }
-                    navigator.pushNamed('/selectScreen');
+                    navigator.pushReplacementNamed('/selectScreen');
                   }
                 ),
               ),

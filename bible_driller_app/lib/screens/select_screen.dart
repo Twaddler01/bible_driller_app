@@ -4,7 +4,7 @@ import '../models/selection_model.dart';
 import 'drill_screen.dart';
 
 class SelectScreen extends StatelessWidget {
-  final List<String> versions = ['KJV', 'NKJV'];
+  final List<String> versions = ['KJV', 'CSB'];
   final List<String> colors = ['Red', 'Green', 'Blue'];
 
   @override

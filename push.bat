@@ -2,7 +2,7 @@
 echo Committing and pushing to 'update' branch...
 
 :: Replace with your info
-set GIT_URL=https://Twaddler01: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@github.com/Twaddler01/bible_driller_app.git
+set GIT_URL=https://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@github.com/Twaddler01/bible_driller_app.git
 
 :: Initialize Git if not already done
 git rev-parse --is-inside-work-tree >nul 2>&1

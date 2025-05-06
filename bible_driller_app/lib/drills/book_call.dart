@@ -1,6 +1,9 @@
+// book_call.dart
+
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/book_call_model.dart';
-import '../services/book_call_service.dart';
 
 class BookCallDrill extends StatefulWidget {
   const BookCallDrill({super.key});
@@ -10,149 +13,198 @@ class BookCallDrill extends StatefulWidget {
 }
 
 class _BookCallDrillState extends State<BookCallDrill> {
-  final BookCallService _service = BookCallService();
-  List<BookCallModel> _books = [];
+  List<BookCallModel> _originalList = [];
+  List<BookCallModel> _currentList = [];
   int _currentIndex = 0;
+  bool _isRandomized = false;
   bool _showAnswer = false;
 
   @override
   void initState() {
     super.initState();
-    _loadBooks();
+    _loadData();
   }
 
-  Future<void> _loadBooks() async {
-    final books = await _service.loadBookCalls();
+  Future<void> _loadData() async {
+    final String jsonString = await rootBundle.loadString('assets/data/bibleBooks.json');
+    final List<dynamic> jsonList = json.decode(jsonString);
+    final books = jsonList.map((json) => BookCallModel.fromJson(json)).toList();
+
     setState(() {
-      _books = books;
+      _originalList = books;
+      _currentList = List.from(books);
+    });
+  }
+
+  void _toggleRandomization(bool? value) {
+    setState(() {
+      _isRandomized = value ?? false;
+
+      // Ensure you're working with a List<BookCallModel>
+      final list = List<BookCallModel>.from(_originalList);
+
+      if (_isRandomized) {
+        list.shuffle();
+      }
+
+      _currentList = list;
+      _currentIndex = 0;
+      _showAnswer = false;
     });
   }
 
   void _next() {
-    setState(() {
-      _showAnswer = false;
-      _currentIndex = (_currentIndex + 1) % _books.length;
-    });
+    if (_currentIndex < _currentList.length - 1) {
+      setState(() {
+        _currentIndex++;
+        _showAnswer = false;
+      });
+    }
   }
 
-  void _toggleAnswer() {
-    setState(() {
-      _showAnswer = !_showAnswer;
-    });
-  }
-
-  void _previous() {
-    setState(() {
-      if (_currentIndex > 0) {
+  void _prev() {
+    if (_currentIndex > 0) {
+      setState(() {
         _currentIndex--;
         _showAnswer = false;
-      }
-    });
-  }
-
-  List<InlineSpan> _parseBA(String htmlBA) {
-    final spans = <InlineSpan>[];
-    final regex = RegExp(r'<span class="ulVerse">(.*?)</span>');
-    final matches = regex.allMatches(htmlBA);
-
-    int currentIndex = 0;
-    for (final match in matches) {
-      // Add text before the match
-      if (match.start > currentIndex) {
-        spans.add(TextSpan(text: htmlBA.substring(currentIndex, match.start)));
-      }
-
-      // Add underlined text
-      final underlinedText = match.group(1)!;
-      spans.add(
-        TextSpan(
-          text: underlinedText,
-          style: const TextStyle(
-            decoration: TextDecoration.underline,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
-
-      currentIndex = match.end;
+      });
     }
-
-    // Add remaining text
-    if (currentIndex < htmlBA.length) {
-      spans.add(TextSpan(text: htmlBA.substring(currentIndex)));
-    }
-
-    return spans;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_books.isEmpty) {
+    if (_currentList.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final current = _books[_currentIndex];
+    final book = _currentList[_currentIndex];
 
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 40),
-          Text(
-            current.book,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // Randomize checkbox
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Checkbox(
+                  value: _isRandomized,
+                  onChanged: _toggleRandomization,
+                ),
+                const Text("Randomize"),
+              ],
+            ),
 
-          // Fixed-height answer box
-          Container(
-            height: 60,
-            alignment: Alignment.center,
-            child: _showAnswer
-                ? Text.rich(
-                    TextSpan(children: _parseBA(current.ba)),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 20),
-                  )
-                : const SizedBox(), // Empty space same size
-          ),
+            const SizedBox(height: 20),
 
-          const Spacer(),
+            // Book display
+            Text(
+              book.book,
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
 
-          // Button group
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Back Arrow (if not at the start)
-              if (_currentIndex > 0)
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: _previous,
-                )
-              else
-                const SizedBox(width: 48), // Keeps layout even
+            const SizedBox(height: 40),
 
-              // Show/Hide Answer
-              ElevatedButton(
-                onPressed: _toggleAnswer,
-                child: Text(_showAnswer ? 'Hide Answer' : 'Show Answer'),
-              ),
+            // Answer area with fixed size
+            SizedBox(
+              height: 60,
+              child: _showAnswer
+                  ? Text.rich(
+                      TextSpan(
+                        children: _parseHtmlSpan(book.ba),
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                  : const Text(''),
+            ),
 
-              // Next Arrow (if not at the end)
-              if (_currentIndex < _books.length - 1)
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward),
-                  onPressed: _next,
-                )
-              else
-                const SizedBox(width: 48), // Keeps layout even
-            ],
-          ),
+            const Spacer(), // Push everything else to bottom
 
-          const SizedBox(height: 32),
-        ],
+            // Buttons: arrows + show answer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 48,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Visibility(
+                      visible: _currentIndex > 0,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_left, color: Colors.green, size: 32),
+                        onPressed: _prev,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showAnswer = true;
+                    });
+                  },
+                  child: const Text('Show Answer'),
+                ),
+                const SizedBox(width: 20),
+                SizedBox(
+                  width: 48,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Visibility(
+                      visible: _currentIndex < _currentList.length - 1,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_right, color: Colors.green, size: 32),
+                        onPressed: _next,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
+  }
+
+  // Handles <span class="ulVerse">...</span> as underlined text
+  List<InlineSpan> _parseHtmlSpan(String html) {
+    final regex = RegExp(r'<span class="ulVerse">(.*?)<\/span>');
+    final matches = regex.allMatches(html);
+
+    List<InlineSpan> spans = [];
+    int lastEnd = 0;
+
+    for (final match in matches) {
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: html.substring(lastEnd, match.start)));
+      }
+
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: const TextStyle(decoration: TextDecoration.underline),
+      ));
+
+      lastEnd = match.end;
+    }
+
+    if (lastEnd < html.length) {
+      spans.add(TextSpan(text: html.substring(lastEnd)));
+    }
+
+    return spans;
   }
 }

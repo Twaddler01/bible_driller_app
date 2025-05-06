@@ -1,8 +1,9 @@
+// selection_model.dart
 import 'package:flutter/foundation.dart';
 
 class SelectionModel with ChangeNotifier {
-  String _version = 'KJV';
-  String _color = 'Red';
+  String _version = 'kjv';
+  String _color = 'red';
   bool _drillStarted = false;
 
   String get version => _version;

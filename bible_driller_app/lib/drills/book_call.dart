@@ -79,87 +79,104 @@ class _BookCallDrillState extends State<BookCallDrill> {
 
     final book = _currentList[_currentIndex];
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Randomize checkbox
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Checkbox(
-              value: _isRandomized,
-              onChanged: _toggleRandomization,
+            // Randomize checkbox
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Checkbox(
+                  value: _isRandomized,
+                  onChanged: _toggleRandomization,
+                ),
+                const Text("Randomize"),
+              ],
             ),
-            const Text("Randomize"),
-          ],
-        ),
 
-        const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-        // Book display
-        Text(
-          book.book,
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        ),
+            // Book display
+            Text(
+              book.book,
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
 
-        const SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-        // Answer area with fixed size
-        SizedBox(
-          height: 60,
-          child: _showAnswer
-              ? Text.rich(
-                  TextSpan(
-                    children: _parseHtmlSpan(book.ba),
+            // Answer area with fixed size
+            SizedBox(
+              height: 60,
+              child: _showAnswer
+                  ? Text.rich(
+                      TextSpan(
+                        children: _parseHtmlSpan(book.ba),
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                  : const Text(''),
+            ),
+
+            const Spacer(), // Push everything else to bottom
+
+            // Buttons: arrows + show answer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 48,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Visibility(
+                      visible: _currentIndex > 0,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_left, color: Colors.green, size: 32),
+                        onPressed: _prev,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                )
-              : const Text(''),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Buttons: arrows + show answer
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _currentIndex > 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_left, color: Colors.green, size: 32),
-                onPressed: _prev,
-              )
-            : const Icon(
-                Icons.arrow_left,
-                color: Colors.grey, // Disabled color
-                size: 32,
-              ),
-              // Small spacer
-              //if (_currentIndex != 0 || _currentIndex != _currentList.length - 1)
-              //const SizedBox(width: 5),
-            const SizedBox(width: 20),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _showAnswer = true;
-                });
-              },
-              child: const Text('Show Answer'),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showAnswer = true;
+                    });
+                  },
+                  child: const Text('Show Answer'),
+                ),
+                const SizedBox(width: 20),
+                SizedBox(
+                  width: 48,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Visibility(
+                      visible: _currentIndex < _currentList.length - 1,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_right, color: Colors.green, size: 32),
+                        onPressed: _next,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 20),
-            _currentIndex < _currentList.length - 1
-            ? IconButton(
-              icon: const Icon(Icons.arrow_right, color: Colors.green, size: 32),
-              onPressed: _next,
-            )
-            : const Icon(
-              Icons.arrow_right,
-              color: Colors.grey, // Disabled color
-              size: 32,
-              
-            ),
+            const SizedBox(height: 20),
           ],
         ),
-      ],
+      ),
     );
   }
 

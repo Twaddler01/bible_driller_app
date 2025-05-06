@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/selection_model.dart';
 import 'drill_screen.dart';
+import '../shared/display_options.dart';
+
+final versions = versionOptions;
+final colors = colorOptions;
 
 class SelectScreen extends StatelessWidget {
-  final List<String> versions = const ['KJV', 'CSB'];
-  final List<String> colors = const ['Red', 'Green', 'Blue'];
 
   const SelectScreen({super.key});
 
@@ -23,26 +25,31 @@ class SelectScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Version Dropdown
             Text('Select Version:', style: TextStyle(fontSize: 18)),
             DropdownButton<String>(
               value: selection.version,
               onChanged: (val) => selection.setVersion(val!),
               items: versions.map((v) => DropdownMenuItem(
-                value: v,
-                child: Text(v),
+                value: v.value,
+                child: Text(v.display),
               )).toList(),
             ),
             SizedBox(height: 20),
+
+            // Color Dropdown
             Text('Select Color:', style: TextStyle(fontSize: 18)),
             DropdownButton<String>(
               value: selection.color,
               onChanged: (val) => selection.setColor(val!),
-              items: colors.map((c) => DropdownMenuItem(
-                value: c,
-                child: Text(c),
+              items: colors.map((v) => DropdownMenuItem(
+                  value: v.value,
+                  child: Text(v.display),
               )).toList(),
             ),
-            SizedBox(height: 20), // space before button
+            SizedBox(height: 20),
+
+            // Start Drill Button
             Center(
               child: ElevatedButton(
                 onPressed: (selection.version.isNotEmpty && selection.color.isNotEmpty)
@@ -52,7 +59,7 @@ class SelectScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (_) => DrillScreen()),
                         );
                       }
-                    : null, // disables the button
+                    : null, // disables the button if not selected
                 child: Text('Start Drills'),
               ),
             ),

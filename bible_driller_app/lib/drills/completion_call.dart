@@ -1,4 +1,5 @@
 // completion_call.dart
+import 'package:bible_driller_app/widgets/drill_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/completion_call_model.dart';
@@ -53,7 +54,7 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
   }
 
   void _next() {
-    if (_currentIndex < _currentList.length - 1) {
+    if (_currentIndex <= _currentList.length) {
       setState(() {
         _currentIndex++;
         _showAnswer = false;
@@ -80,8 +81,10 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
       return const Center(child: Text('No matching verses found.'));
     }
 
-    final call = _currentList[_currentIndex];
-
+    final call = _currentIndex < _currentList.length
+        ? _currentList[_currentIndex]
+        : null;
+    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -106,7 +109,7 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: call.verseUl,
+                      text: call != null ? call.verseUl : '',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -116,7 +119,7 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
                     ),
                     if (_showAnswer)
                       TextSpan(
-                        text: '${call.verse} ${call.ref}',
+                        text: call != null ? '${call.verse} ${call.ref}' : '',
                         style: const TextStyle(
                           fontSize: 18,
                           color: Colors.black,
@@ -132,6 +135,11 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
 
             const Spacer(), // Pushes nav to bottom
 
+            DrillProgressIndicator(
+              currentIndex: _currentIndex,
+              total: _currentList.length,
+            ),
+            
             // Navigation and Show Answer row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +177,7 @@ class _CompletionCallDrillState extends State<CompletionCallDrill> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Visibility(
-                      visible: _currentIndex < _currentList.length - 1,
+                      visible: _currentIndex < _currentList.length,
                       maintainSize: true,
                       maintainAnimation: true,
                       maintainState: true,

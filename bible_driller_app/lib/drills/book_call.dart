@@ -1,9 +1,9 @@
 // book_call.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/book_call_model.dart';
+import '../widgets/drill_progress_indicator.dart';
 
 class BookCallDrill extends StatefulWidget {
   const BookCallDrill({super.key});
@@ -54,7 +54,7 @@ class _BookCallDrillState extends State<BookCallDrill> {
   }
 
   void _next() {
-    if (_currentIndex < _currentList.length - 1) {
+    if (_currentIndex <= _currentList.length) {
       setState(() {
         _currentIndex++;
         _showAnswer = false;
@@ -77,7 +77,9 @@ class _BookCallDrillState extends State<BookCallDrill> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final book = _currentList[_currentIndex];
+    final book = _currentIndex < _currentList.length
+        ? _currentList[_currentIndex]
+        : null;
 
     return Scaffold(
       body: SafeArea(
@@ -99,6 +101,7 @@ class _BookCallDrillState extends State<BookCallDrill> {
             const SizedBox(height: 20),
 
             // Book display
+            if (book != null)
             Text(
               book.book,
               style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
@@ -109,9 +112,10 @@ class _BookCallDrillState extends State<BookCallDrill> {
             // Answer area with fixed size
             SizedBox(
               height: 60,
-              child: _showAnswer
+              child: _showAnswer && book != null
                   ? Text.rich(
                       TextSpan(
+                        style: const TextStyle(fontSize: 18),
                         children: _parseHtmlSpan(book.ba),
                       ),
                       textAlign: TextAlign.center,
@@ -121,6 +125,11 @@ class _BookCallDrillState extends State<BookCallDrill> {
 
             const Spacer(), // Push everything else to bottom
 
+            DrillProgressIndicator(
+              currentIndex: _currentIndex,
+              total: _currentList.length,
+            ),
+            
             // Buttons: arrows + show answer
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -158,7 +167,7 @@ class _BookCallDrillState extends State<BookCallDrill> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Visibility(
-                      visible: _currentIndex < _currentList.length - 1,
+                      visible: _currentIndex < _currentList.length,
                       maintainSize: true,
                       maintainAnimation: true,
                       maintainState: true,
@@ -195,7 +204,7 @@ class _BookCallDrillState extends State<BookCallDrill> {
 
       spans.add(TextSpan(
         text: match.group(1),
-        style: const TextStyle(decoration: TextDecoration.underline),
+        style: const TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold),
       ));
 
       lastEnd = match.end;

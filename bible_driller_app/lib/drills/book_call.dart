@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/book_call_model.dart';
 import '../widgets/drill_progress_indicator.dart';
+import '../screens/custom_screen.dart';
 
 class BookCallDrill extends StatefulWidget {
   const BookCallDrill({super.key});
@@ -18,6 +19,8 @@ class _BookCallDrillState extends State<BookCallDrill> {
   int _currentIndex = 0;
   bool _isRandomized = false;
   bool _showAnswer = false;
+  bool _useCustomSelection = false;
+  List<String> _customSelectedBooks = [];
 
   @override
   void initState() {
@@ -40,8 +43,16 @@ class _BookCallDrillState extends State<BookCallDrill> {
     setState(() {
       _isRandomized = value ?? false;
 
-      // Ensure you're working with a List<BookCallModel>
-      final list = List<BookCallModel>.from(_originalList);
+      List<BookCallModel> list;
+      if (_useCustomSelection && _customSelectedBooks.isNotEmpty) {
+        // Only use the selected books
+        list = _originalList
+            .where((item) => _customSelectedBooks.contains(item.book))
+            .toList();
+      } else {
+        // Use full list
+        list = List.from(_originalList);
+      }
 
       if (_isRandomized) {
         list.shuffle();
@@ -95,6 +106,47 @@ class _BookCallDrillState extends State<BookCallDrill> {
                   onChanged: _toggleRandomization,
                 ),
                 const Text("Randomize"),
+                const SizedBox(width: 20),
+                Checkbox(
+                  value: _useCustomSelection,
+                  onChanged: (val) async {
+                    if (val == true) {
+                      final selected = await Navigator.push<List<String>>(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CustomSelectionScreen()),
+                      );
+
+                      if (selected != null && selected.isNotEmpty) {
+                        setState(() {
+                          _useCustomSelection = true;
+                          _customSelectedBooks = selected;
+                          _currentList = _originalList
+                              .where((item) => selected.contains(item.book))
+                              .toList();
+                          if (_isRandomized) {
+                            _currentList.shuffle();
+                          }
+                          _currentIndex = 0;
+                          _showAnswer = false;
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        _useCustomSelection = false;
+                        _customSelectedBooks = [];
+                        _currentList = List.from(_originalList);
+                        if (_isRandomized) _currentList.shuffle();
+                        _currentIndex = 0;
+                        _showAnswer = false;
+                      });
+                    }
+                  },
+                ),
+                Text(
+                  _useCustomSelection
+                    ? "Customized Selections (${_customSelectedBooks.length}/${_originalList.length})"
+                    : "Customize Selections",
+                ),
               ],
             ),
 
